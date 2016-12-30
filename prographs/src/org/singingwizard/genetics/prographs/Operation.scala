@@ -38,7 +38,7 @@ case class InputValues(values: Map[AnyPort, Value]) {
 class OutputValues(val values: Map[AnyPort, Set[Value]]) {
   def +[T](p: (Port[T], T)): OutputValues = {
     val (port, v) = p
-    assert(port.tpe.isInstance(v))
+    assert(port.tpe.isInstance(v), s"$port must have type ${port.tpe}. Had value $v.")
     val nv = values.getOrElse(port, Set()) + v.asInstanceOf[Value]
     new OutputValues(values + (port -> nv))
   }

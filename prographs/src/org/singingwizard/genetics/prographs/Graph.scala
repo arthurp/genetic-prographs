@@ -10,6 +10,9 @@ class Block(val name: String, val operation: Operation) {
     require((operation.inputs contains port) || (operation.outputs contains port))
     PortOnBlock(this, port)
   }
+  
+  def inputs = operation.inputs.map(PortOnBlock(this, _))
+  def outputs = operation.outputs.map(PortOnBlock(this, _))
 }
 case class PortOnBlock[T](block: Block, port: Port[T]) {
   def -->(other: PortOnBlock[T]) = {
@@ -35,6 +38,12 @@ ${blocks.mkString("\n")}
 ${connections.map(c => s"${c.src.block.name}.${c.src.port.name} --> ${c.dst.block.name}.${c.dst.port.name}").mkString("\n")}
 }
 """
+  }
+
+  def listeningPorts[T](p: PortOnBlock[T]): Set[PortOnBlock[T]] = {
+    for(c <- connections if c.src == p) yield {
+      c.dst.asInstanceOf[PortOnBlock[T]]
+    }
   }
   
   def inputBlocks = blocks.filter(_.operation.isInput)
