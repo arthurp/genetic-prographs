@@ -68,3 +68,15 @@ case class Constant[T](tpe: Type[T], v: T) extends Operation {
     OutputValues(Out -> v)
   }
 }
+
+case class TriggeredConstant[T](tpe: Type[T], v: T, tpe2: Type[T]) extends Operation {
+  val Trigger = Port("Trigger", tpe2)
+  val Out = Port("Out", tpe)
+  
+  val inputs = IndexedSeq(Trigger)
+  val outputs = IndexedSeq(Out)
+  
+  def run(values: InputValues): OutputValues = {
+    OutputValues(Out -> v)
+  }
+}

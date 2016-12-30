@@ -6,4 +6,5 @@ package object prographs extends ObjectLogger {
   type Value = AnyRef
   type AnyPort = Port[_]
   type AnyConnection = Connection[_]
+  type AnyBlock = Block[Operation]
 }

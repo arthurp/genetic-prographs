@@ -1,7 +1,6 @@
 package org.singingwizard.genetics.prographs
 
 import scala.reflect.ClassTag
-import java.lang.{Byte, Short, Long, Boolean, Character, Float, Double}
   
 
 sealed abstract class Type[_T : ClassTag] {
@@ -9,13 +8,13 @@ sealed abstract class Type[_T : ClassTag] {
   
   def isInstance(v: Any) = {
     val cls = implicitly[ClassTag[T]].runtimeClass match {
-      case Integer.TYPE => classOf[Integer]
-      case Byte.TYPE => classOf[Byte]
-      case Short.TYPE => classOf[Short]
-      case Boolean.TYPE => classOf[Boolean]
-      case Character.TYPE => classOf[Character]
-      case Float.TYPE => classOf[Float]
-      case Double.TYPE => classOf[Double]
+      case java.lang.Integer.TYPE => classOf[java.lang.Integer]
+      case java.lang.Byte.TYPE => classOf[java.lang.Byte]
+      case java.lang.Short.TYPE => classOf[java.lang.Short]
+      case java.lang.Boolean.TYPE => classOf[java.lang.Boolean]
+      case java.lang.Character.TYPE => classOf[java.lang.Character]
+      case java.lang.Float.TYPE => classOf[java.lang.Float]
+      case java.lang.Double.TYPE => classOf[java.lang.Double]
       case c => c
     }
     //Logger.finer(s"Checking type of $v against $this (${implicitly[ClassTag[T]].runtimeClass}, $cls)")
@@ -25,3 +24,4 @@ sealed abstract class Type[_T : ClassTag] {
 
 case object TypeInt extends Type[Int]
 case object TypeString extends Type[String]
+case object TypeBoolean extends Type[Boolean]

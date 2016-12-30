@@ -8,12 +8,13 @@ import org.singingwizard.genetics.prographs.Graph
 import org.singingwizard.genetics.prographs.PortOnBlock
 import org.singingwizard.genetics.prographs.Value
 import org.singingwizard.genetics.prographs.AnyPort
+import org.singingwizard.genetics.prographs.AnyBlock
 
 import org.singingwizard.util.RandomSelection._
 
 class Interpreter(graph: Graph) {
   def run(): Unit = {
-    val readyBlocks = new mutable.HashSet[Block]()
+    val readyBlocks = new mutable.HashSet[AnyBlock]()
     val channels = new mutable.HashMap[PortOnBlock[_], mutable.Buffer[Value]]()
 
     def getChannel(p: PortOnBlock[_]): mutable.Buffer[Value] = {
@@ -31,7 +32,7 @@ class Interpreter(graph: Graph) {
         p.port -> getChannel(p).takeRandom()
       }
       Logger.finest(s"Executing block $block with input $inputs")
-      val outputs = block.operation.run(inputs.toMap[AnyPort, Value])
+      val outputs = invokeBlock(block, inputs)
       Logger.fine(s"Executing block $block with input $inputs and output $outputs")
 
       val listeningBlocks = (for ((p, v) <- outputs) yield {
@@ -45,5 +46,9 @@ class Interpreter(graph: Graph) {
       Logger.fine(s"New blocks ready: $newReadyBlocks")
       newReadyBlocks foreach { readyBlocks += _ }
     }
+  }
+
+  protected def invokeBlock(block: AnyBlock, inputs: IndexedSeq[(AnyPort, Value)]) = {
+    block.operation.run(inputs.toMap[AnyPort, Value])
   }
 }
