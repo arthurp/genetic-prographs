@@ -25,8 +25,8 @@ case class Select[T](tpe: Type[T]) extends Operation {
 
 case class Switch[T](tpe: Type[T]) extends Operation {
   val Pred = Port("Pred", TypeBoolean)
-  val In = Port("True", tpe)
-  val True = Port("Out", tpe)
+  val In = Port("In", tpe)
+  val True = Port("True", tpe)
   val False = Port("False", tpe)
   
   val inputs = IndexedSeq(Pred, In)
