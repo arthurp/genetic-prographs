@@ -2,9 +2,8 @@ package org.singingwizard.genetics.prographs
 
 import java.util.logging.{ ConsoleHandler, Level, Logger ⇒ JLogger, SimpleFormatter }
 
-import org.singingwizard.genetics.prographs.interpreter.Interpreter
+import org.singingwizard.genetics.prographs.interpreter.{ IOInput, IOInterpreter, IOOutput }
 import org.singingwizard.genetics.prographs.operations._
-import org.singingwizard.util.Graphviz
 
 object Main {
   val consoleHandler = new ConsoleHandler()
@@ -12,16 +11,21 @@ object Main {
   consoleHandler.setFormatter(new SimpleFormatter())
 
   val app = JLogger.getLogger("")
-  app.setLevel(Level.FINEST)
+  app.setLevel(Level.INFO)
   app.addHandler(consoleHandler)
+
+  val Sum = Port("Sum", TypeInt)
+  val Max = Port("Max", TypeInt)
 
   def main(args: Array[String]): Unit = {
     var g = buildSumUpto()
-    println(g)
-    println(g.toDot)
-    Graphviz.display(g.toDot)
-    val interp = new Interpreter(g)
+    //println(g)
+    //println(g.toDot)
+    //Graphviz.display(g.toDot)
+    val interp = new IOInterpreter(g)
+    interp.inputs += (Max -> 10)
     interp.run()
+    println(interp.outputs)
   }
 
   def buildSumGraph() = {
@@ -43,7 +47,7 @@ object Main {
   }
 
   def buildSumUpto() = {
-    val in = new Block("in", Constant(TypeInt, 5))
+    val in = new Block("in", IOInput(Max))
     val v0 = new Block("0", Constant(TypeInt, 0))
 
     val tvm1 = new Block("-1", TriggeredConstant(TypeInt, -1, TypeInt))
@@ -54,8 +58,7 @@ object Main {
     val switch1 = new Block("c", Switch(TypeInt))
     val switch2 = new Block("c", Switch(TypeInt))
     val lt = new Block("<", LessThan)
-    val conv = new Block("conv", IntToString)
-    val log = new Block("log", Log)
+    val out = new Block("out", IOOutput(Sum))
 
     Graph(
       in(in.Out) --> tvm1(tvm1.Trigger),
@@ -81,9 +84,7 @@ object Main {
       lt(lt.Out) --> switch1(switch1.Pred),
       add_sum(add_sum.Sum) --> switch1(switch1.In),
 
-      switch1(switch1.True) --> conv(conv.In),
-
-      conv(conv.Out) --> log(log.In)
+      switch1(switch1.True) --> out(out.In)
     )
   }
 }

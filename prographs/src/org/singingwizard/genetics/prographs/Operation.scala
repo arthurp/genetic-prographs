@@ -32,12 +32,12 @@ trait Operation extends OperationBase {
 }
 
 case class InputValues(values: Map[AnyPort, Value]) {
-  def +[T <: Value](p: (Port[T], T)): InputValues = {
+  def +[T](p: (Port[T], T)): InputValues = {
     val (port, v) = p
     assert(port.tpe.isInstance(v), s"$port must have type ${port.tpe}. Had value $v.")
-    new InputValues(values + (port -> v))
+    new InputValues(values + (port -> v.asInstanceOf[Value]))
   }
-  
+
   def apply[T](port: Port[T]): T = {
     values(port).asInstanceOf[T]
   }
@@ -45,12 +45,12 @@ case class InputValues(values: Map[AnyPort, Value]) {
 
 object InputValues {
   def apply(): InputValues = new InputValues(Map())
-  def apply[T <: Value](p: (Port[T], T)): InputValues = InputValues() + p
-  def apply[T1 <: Value, T2 <: Value](p1: (Port[T1], T1), p2: (Port[T2], T2)): InputValues =
+  def apply[T](p: (Port[T], T)): InputValues = InputValues() + p
+  def apply[T1, T2](p1: (Port[T1], T1), p2: (Port[T2], T2)): InputValues =
     InputValues() + p1 + p2
 }
 
-class OutputValues(val values: Map[AnyPort, Set[Value]]) {
+case class OutputValues(val values: Map[AnyPort, Set[Value]]) {
   def +[T](p: (Port[T], T)): OutputValues = {
     val (port, v) = p
     assert(port.tpe.isInstance(v), s"$port must have type ${port.tpe}. Had value $v.")

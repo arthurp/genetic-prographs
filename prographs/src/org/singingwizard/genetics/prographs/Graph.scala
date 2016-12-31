@@ -79,7 +79,7 @@ ${connections.map(c ⇒ s"${c.src.block.name}.${c.src.port.name} --> ${c.dst.blo
 """
   }
 
-  def dotName = s"Graph${hashCode}"
+  def dotName = s"Graph${hashCode.toHexString}"
 
   def toDot() = {
     s"""
