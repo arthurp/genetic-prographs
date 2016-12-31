@@ -1,10 +1,8 @@
 package org.singingwizard.genetics.prographs
 
+import java.util.logging.{ ConsoleHandler, Level, Logger ⇒ JLogger, SimpleFormatter }
+
 import org.singingwizard.genetics.prographs.interpreter.Interpreter
-import java.util.logging.ConsoleHandler
-import java.util.logging.Level
-import java.util.logging.SimpleFormatter
-import java.util.logging.{ Logger ⇒ JLogger }
 import org.singingwizard.genetics.prographs.operations._
 import org.singingwizard.util.Graphviz
 
@@ -16,7 +14,7 @@ object Main {
   val app = JLogger.getLogger("")
   app.setLevel(Level.FINEST)
   app.addHandler(consoleHandler)
-  
+
   def main(args: Array[String]): Unit = {
     var g = buildSumUpto()
     println(g)
@@ -47,7 +45,7 @@ object Main {
   def buildSumUpto() = {
     val in = new Block("in", Constant(TypeInt, 5))
     val v0 = new Block("0", Constant(TypeInt, 0))
-    
+
     val tvm1 = new Block("-1", TriggeredConstant(TypeInt, -1, TypeInt))
     val tv1 = new Block("1", TriggeredConstant(TypeInt, 1, TypeInt))
     val tv1_2 = new Block("1", TriggeredConstant(TypeInt, 1, TypeInt))
@@ -60,32 +58,32 @@ object Main {
     val log = new Block("log", Log)
 
     Graph(
-        in(in.Out) --> tvm1(tvm1.Trigger),
-        switch2(switch2.False) --> tvm1(tvm1.Trigger),
-        
-        in(in.Out) --> add_dec(Add.A),
-        switch2(switch2.False) --> add_dec(Add.A),
-        tvm1(tvm1.Out) --> add_dec(Add.B),
-        
-        add_dec(Add.Sum) --> switch2(switch2.In),
-        lt(lt.Out) --> switch2(switch2.Pred), 
-        
-        add_dec(Add.Sum) --> tv1_2(tv1_2.Trigger),
+      in(in.Out) --> tvm1(tvm1.Trigger),
+      switch2(switch2.False) --> tvm1(tvm1.Trigger),
 
-        add_dec(Add.Sum) --> lt(lt.A),
-        tv1_2(tv1_2.Out) --> lt(lt.B),
+      in(in.Out) --> add_dec(Add.A),
+      switch2(switch2.False) --> add_dec(Add.A),
+      tvm1(tvm1.Out) --> add_dec(Add.B),
 
-        in(in.Out) --> add_sum(Add.A),
-        add_dec(add_dec.Sum) --> add_sum(Add.A),
-        v0(v0.Out) --> add_sum(Add.B),
-        switch1(switch1.False) --> add_sum(Add.B),
+      add_dec(Add.Sum) --> switch2(switch2.In),
+      lt(lt.Out) --> switch2(switch2.Pred),
 
-        lt(lt.Out) --> switch1(switch1.Pred), 
-        add_sum(add_sum.Sum) --> switch1(switch1.In), 
+      add_dec(Add.Sum) --> tv1_2(tv1_2.Trigger),
 
-        switch1(switch1.True) --> conv(conv.In),
-        
-        conv(conv.Out) --> log(log.In)
+      add_dec(Add.Sum) --> lt(lt.A),
+      tv1_2(tv1_2.Out) --> lt(lt.B),
+
+      in(in.Out) --> add_sum(Add.A),
+      add_dec(add_dec.Sum) --> add_sum(Add.A),
+      v0(v0.Out) --> add_sum(Add.B),
+      switch1(switch1.False) --> add_sum(Add.B),
+
+      lt(lt.Out) --> switch1(switch1.Pred),
+      add_sum(add_sum.Sum) --> switch1(switch1.In),
+
+      switch1(switch1.True) --> conv(conv.In),
+
+      conv(conv.Out) --> log(log.In)
     )
   }
 }

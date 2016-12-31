@@ -1,20 +1,18 @@
 package org.singingwizard.genetics.prographs
 
-import org.singingwizard.util.DotableGraph
-import org.singingwizard.util.DotableNode
-import org.singingwizard.util.DotableEdge
+import org.singingwizard.util.{ DotableEdge, DotableGraph, DotableNode }
 
 class Block[+Op <: Operation](val name: String, val operation: Op) extends DotableNode {
   override def toString() = {
     val id = System.identityHashCode(this).toHexString
     s"Block@$id('$name', ${operation})"
   }
-  
+
   def apply[T](port: Port[T]) = {
     require((operation.inputs contains port) || (operation.outputs contains port))
     PortOnBlock(this, port)
   }
-  
+
   def inputs = operation.inputs.map(PortOnBlock(this, _))
   def outputs = operation.outputs.map(PortOnBlock(this, _))
 
@@ -49,9 +47,9 @@ case class PortOnBlock[T](block: AnyBlock, port: Port[T]) extends DotableNode {
   }
 }
 case class Connection[T](src: PortOnBlock[T], dst: PortOnBlock[T]) extends DotableEdge {
-  require(src.port.tpe == dst.port.tpe, 
-      s"Connections must have the same type on both ends; ports ${src.port} -> ${dst.port}")
-  
+  require(src.port.tpe == dst.port.tpe,
+    s"Connections must have the same type on both ends; ports ${src.port} -> ${dst.port}")
+
   def tpe = src.port.tpe
 
   def dotName: String = {
@@ -66,23 +64,23 @@ case class Connection[T](src: PortOnBlock[T], dst: PortOnBlock[T]) extends Dotab
 }
 
 case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] = Set()) extends DotableGraph {
-  require(connections forall { c => (blocks contains c.src.block) && (blocks contains c.dst.block) },
-      s"Graph contains a connection to a block not in this graph.")   
-  
+  require(connections forall { c ⇒ (blocks contains c.src.block) && (blocks contains c.dst.block) },
+    s"Graph contains a connection to a block not in this graph.")
+
   def +(c: AnyConnection) = Graph(blocks + c.src.block + c.dst.block, connections + c)
   def +(b: AnyBlock) = Graph(blocks + b, connections)
-  
+
   override def toString() = {
     s"""Graph{
 ${blocks.mkString("\n")}
 =======
-${connections.map(c => s"${c.src.block.name}.${c.src.port.name} --> ${c.dst.block.name}.${c.dst.port.name}").mkString("\n")}
+${connections.map(c ⇒ s"${c.src.block.name}.${c.src.port.name} --> ${c.dst.block.name}.${c.dst.port.name}").mkString("\n")}
 }
 """
   }
-  
+
   def dotName = s"Graph${hashCode}"
-  
+
   def toDot() = {
     s"""
       digraph $dotName {
@@ -93,11 +91,11 @@ ${connections.map(c => s"${c.src.block.name}.${c.src.port.name} --> ${c.dst.bloc
   }
 
   def listeningPorts[T](p: PortOnBlock[T]): Set[PortOnBlock[T]] = {
-    for(c <- connections if c.src == p) yield {
+    for (c ← connections if c.src == p) yield {
       c.dst.asInstanceOf[PortOnBlock[T]]
     }
   }
-  
+
   def inputBlocks = blocks.filter(_.operation.isInput)
   def outputBlocks = blocks.filter(_.operation.isOutput)
 }
