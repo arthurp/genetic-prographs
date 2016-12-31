@@ -63,7 +63,7 @@ case class Constant[T](tpe: Type[T], v: T) extends Operation {
   }
 }
 
-case class TriggeredConstant[T](tpe: Type[T], v: T, tpe2: Type[T]) extends Operation {
+case class TriggeredConstant[T, T2](tpe: Type[T], v: T, tpe2: Type[T2]) extends Operation {
   val Trigger = Port("Trigger", tpe2)
   val Out = Port("Out", tpe)
 

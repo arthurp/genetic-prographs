@@ -4,14 +4,9 @@ import scala.runtime.ScalaRunTime
 
 case class Port[T](name: String, tpe: Type[T])
 
-trait Operation {
+trait OperationBase {
   val inputs: IndexedSeq[AnyPort]
   val outputs: IndexedSeq[AnyPort]
-
-  def run(values: Map[AnyPort, Value]): Map[AnyPort, Set[Value]] =
-    run(InputValues(values)).values
-
-  def run(values: InputValues): OutputValues
 
   override def toString() = {
     this match {
@@ -29,10 +24,30 @@ trait Operation {
   def isOutput = outputs.isEmpty
 }
 
+trait Operation extends OperationBase {
+  def run(values: Map[AnyPort, Value]): Map[AnyPort, Set[Value]] =
+    run(InputValues(values)).values
+
+  def run(values: InputValues): OutputValues
+}
+
 case class InputValues(values: Map[AnyPort, Value]) {
+  def +[T <: Value](p: (Port[T], T)): InputValues = {
+    val (port, v) = p
+    assert(port.tpe.isInstance(v), s"$port must have type ${port.tpe}. Had value $v.")
+    new InputValues(values + (port -> v))
+  }
+  
   def apply[T](port: Port[T]): T = {
     values(port).asInstanceOf[T]
   }
+}
+
+object InputValues {
+  def apply(): InputValues = new InputValues(Map())
+  def apply[T <: Value](p: (Port[T], T)): InputValues = InputValues() + p
+  def apply[T1 <: Value, T2 <: Value](p1: (Port[T1], T1), p2: (Port[T2], T2)): InputValues =
+    InputValues() + p1 + p2
 }
 
 class OutputValues(val values: Map[AnyPort, Set[Value]]) {
