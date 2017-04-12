@@ -2,7 +2,12 @@ package org.singingwizard.genetics.prographs
 
 import scala.runtime.ScalaRunTime
 
-case class Port[T](name: String, tpe: Type[T])
+trait PortTag {
+}
+
+case class Port[T](name: String, tpe: Type[T], tags: Set[PortTag] = Set()) {
+  type ElementType = T
+}
 
 trait OperationBase {
   val inputs: IndexedSeq[AnyPort]
@@ -56,6 +61,19 @@ case class OutputValues(val values: Map[AnyPort, Set[Value]]) {
     assert(port.tpe.isInstance(v), s"$port must have type ${port.tpe}. Had value $v.")
     val nv = values.getOrElse(port, Set()) + v.asInstanceOf[Value]
     new OutputValues(values + (port -> nv))
+  }
+
+  def apply[T](port: Port[T]): Set[port.ElementType] = {
+    values(port).asInstanceOf[Set[T]]
+  }
+
+  def errorIn(o: OutputValues): Double = {
+    val diffs = for((p, vs) <- this.values.toIterable) yield {
+      val ov = o(p).asInstanceOf[Set[Value]]
+      val diff = (ov - vs) & (vs - ov)
+      diff.size / 2.0
+    }
+    diffs.sum
   }
 }
 

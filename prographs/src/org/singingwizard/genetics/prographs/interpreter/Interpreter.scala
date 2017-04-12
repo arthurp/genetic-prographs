@@ -3,7 +3,7 @@ package org.singingwizard.genetics.prographs.interpreter
 import scala.collection.mutable
 
 import org.singingwizard.genetics.prographs.{ AnyBlock, AnyPort, Graph, PortOnBlock, Value }
-import org.singingwizard.util.RandomSelection._
+import org.singingwizard.util.collections.RandomSelection._
 
 class Interpreter(graph: Graph) {
   def run(): Unit = {

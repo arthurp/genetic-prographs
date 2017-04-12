@@ -1,11 +1,12 @@
 package org.singingwizard.genetics.prographs
 
 import org.singingwizard.util.{ DotableEdge, DotableGraph, DotableNode }
+import scala.reflect.ClassTag
 
-class Block[+Op <: Operation](val name: String, val operation: Op) extends DotableNode {
+class Block[+Op <: Operation: ClassTag](val name: String, val operation: Op) extends DotableNode {
   override def toString() = {
     val id = System.identityHashCode(this).toHexString
-    s"Block@$id('$name', ${operation})"
+    s"Block:$name@$id(${operation})"
   }
 
   def apply[T](port: Port[T]) = {
@@ -37,6 +38,7 @@ case class PortOnBlock[T](block: AnyBlock, port: Port[T]) extends DotableNode {
   def -->(other: PortOnBlock[T]) = {
     Connection(this, other)
   }
+
   def dotName: String = {
     val id = hashCode.toHexString
     s"PortOnBlock_$id"
@@ -46,6 +48,7 @@ case class PortOnBlock[T](block: AnyBlock, port: Port[T]) extends DotableNode {
     s"""$dotName [label="${port.name}"];"""
   }
 }
+
 case class Connection[T](src: PortOnBlock[T], dst: PortOnBlock[T]) extends DotableEdge {
   require(src.port.tpe == dst.port.tpe,
     s"Connections must have the same type on both ends; ports ${src.port} -> ${dst.port}")
@@ -63,7 +66,7 @@ case class Connection[T](src: PortOnBlock[T], dst: PortOnBlock[T]) extends Dotab
   }
 }
 
-case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] = Set()) extends DotableGraph {
+case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] = Set()) extends DotableGraph with GraphAlignment {
   require(connections forall { c ⇒ (blocks contains c.src.block) && (blocks contains c.dst.block) },
     s"Graph contains a connection to a block not in this graph.")
 

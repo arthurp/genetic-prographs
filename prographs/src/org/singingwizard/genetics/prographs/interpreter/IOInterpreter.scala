@@ -6,6 +6,13 @@ class IOInterpreter(graph: Graph) extends Interpreter(graph) {
   var inputs = InputValues()
   var outputs = OutputValues()
 
+  def run(in: InputValues): OutputValues = {
+    outputs = OutputValues()
+    inputs = in
+    run()
+    outputs
+  }
+
   override protected def invokeBlock(block: AnyBlock, inputs: IndexedSeq[(AnyPort, Value)]) = {
     block.operation match {
       case o: IOOperation ⇒ o.run(this, inputs.toMap[AnyPort, Value])
@@ -25,7 +32,12 @@ trait IOOperation extends Operation {
       s"$this only supports executing in an IOInterpreter")
 }
 
-case class IOOutput[T](port: Port[T]) extends IOOperation {
+
+trait IOOutputBase[T] extends IOOperation {
+  val port: Port[T]
+}
+
+case class IOOutput[T](port: Port[T]) extends IOOperation with IOOutputBase[T] {
   val In = Port("In", port.tpe)
 
   val inputs = IndexedSeq(In)
@@ -37,7 +49,11 @@ case class IOOutput[T](port: Port[T]) extends IOOperation {
   }
 }
 
-case class IOInput[T](port: Port[T]) extends IOOperation {
+trait IOInputBase[T] extends IOOperation {
+  val port: Port[T]
+}
+
+case class IOInput[T](port: Port[T]) extends IOOperation with IOInputBase[T] {
   val Out = Port("Out", port.tpe)
 
   val inputs = IndexedSeq()
@@ -48,7 +64,7 @@ case class IOInput[T](port: Port[T]) extends IOOperation {
   }
 }
 
-case class UITriggeredInput[T, T2](port: Port[T], tpe2: Type[T2]) extends IOOperation {
+case class UITriggeredInput[T, T2](port: Port[T], tpe2: Type[T2]) extends IOOperation with IOInputBase[T] {
   val Trigger = Port("Trigger", tpe2)
   val Out = Port("Out", port.tpe)
 
