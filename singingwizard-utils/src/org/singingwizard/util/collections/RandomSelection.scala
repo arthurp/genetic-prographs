@@ -1,7 +1,5 @@
-package org.singingwizard.util
+package org.singingwizard.util.collections
 
-import scala.collection
-import scala.collection.mutable
 import scala.util.Random
 
 object RandomSelection {
@@ -13,7 +11,7 @@ object RandomSelection {
       b
     }
   }
-  implicit class SetWithTakeRandom[T](val underlying: mutable.Set[T]) extends AnyVal {
+  implicit class SetWithTakeRandom[T](val underlying: collection.mutable.Set[T]) extends AnyVal {
     def takeRandom() = {
       val b = underlying.random()
       underlying -= b
@@ -29,7 +27,7 @@ object RandomSelection {
       underlying(randomIndex())
     }
   }
-  implicit class BufferWithTakeRandom[T](val underlying: mutable.Buffer[T]) extends AnyVal {
+  implicit class BufferWithTakeRandom[T](val underlying: collection.mutable.Buffer[T]) extends AnyVal {
     def takeRandom() = {
       underlying.remove(underlying.randomIndex())
     }
