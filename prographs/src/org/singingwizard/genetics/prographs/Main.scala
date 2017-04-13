@@ -22,11 +22,13 @@ object Main {
     var g = buildSumUpto()
     //println(g)
     //println(g.toDot)
-    Graphviz.display(g.toDot)
+    //Graphviz.display(g.toDot)
     val interp = new IOInterpreter(g)
     interp.inputs += (Max -> 10)
     interp.run()
     println(interp.outputs) 
+        
+    g.randomCut()
     
     //g align buildSumUpto2()
   }
@@ -54,12 +56,12 @@ object Main {
     val v0 = new Block("0", Constant(TypeInt, 0))
 
     val tvm1 = new Block("-1", TriggeredConstant(TypeInt, -1, TypeInt))
-    val tv1 = new Block("1", TriggeredConstant(TypeInt, 1, TypeInt))
-    val tv1_2 = new Block("1", TriggeredConstant(TypeInt, 1, TypeInt))
+    val tv1 = new Block("1_1", TriggeredConstant(TypeInt, 1, TypeInt))
+    val tv1_2 = new Block("1_2", TriggeredConstant(TypeInt, 1, TypeInt))
     val add_sum = new Block("sum", Add)
     val add_dec = new Block("dec", Add)
-    val switch1 = new Block("c", Switch(TypeInt))
-    val switch2 = new Block("c", Switch(TypeInt))
+    val switch1 = new Block("c1", Switch(TypeInt))
+    val switch2 = new Block("c2", Switch(TypeInt))
     val lt = new Block("<", LessThan)
     val out = new Block("out", IOOutput(Sum))
 

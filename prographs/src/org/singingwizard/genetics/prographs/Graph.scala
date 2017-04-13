@@ -66,7 +66,7 @@ case class Connection[T](src: PortOnBlock[T], dst: PortOnBlock[T]) extends Dotab
   }
 }
 
-case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] = Set()) extends DotableGraph with GraphAlignment {
+case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] = Set()) extends DotableGraph with GraphAlignment with GraphCutting {
   require(connections forall { c ⇒ (blocks contains c.src.block) && (blocks contains c.dst.block) },
     s"Graph contains a connection to a block not in this graph.")
 

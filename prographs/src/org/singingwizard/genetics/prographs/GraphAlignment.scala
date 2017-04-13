@@ -8,7 +8,9 @@ import org.singingwizard.genetics.prographs.interpreter.IOInputBase
 import org.singingwizard.genetics.prographs.interpreter.IOOutputBase
 import collection.mutable
 
-trait GraphAlignment { this: Graph ⇒
+trait GraphAlignment {
+  this: Graph ⇒
+
   private def comparePorts(a: PortOnBlock[_], b: PortOnBlock[_]): Double = {
     comparePorts(a.port, b.port)
   }
@@ -54,8 +56,8 @@ trait GraphAlignment { this: Graph ⇒
       val startPeri = perimeterBlocks
       perimeterBlocks = new BidiMap[AnyBlock, AnyBlock]()
       for ((l, r) ← startPeri.leftToRight) {
-        val remainingConnectionsL = 
-        pprint.pprintln(blockAlignment.leftToRight)
+        val remainingConnectionsL =
+          pprint.pprintln(blockAlignment.leftToRight)
       }
     }
 
