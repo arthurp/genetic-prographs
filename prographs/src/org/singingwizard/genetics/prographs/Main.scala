@@ -26,11 +26,33 @@ object Main {
     val interp = new IOInterpreter(g)
     interp.inputs += (Max -> 10)
     interp.run()
-    println(interp.outputs) 
-        
-    g.randomCut()
-    
-    //g align buildSumUpto2()
+    println(interp.outputs)
+
+    //    for (i ← 0 to 0) {
+    //      val gr = g.randomInterfacedSubgraph()
+    //      println(s"========= Cut $i (graph size ${gr.graph.blocks.size})")
+    //      pprint.pprintln(gr.inputs)
+    //      pprint.pprintln(gr.outputs)
+    //      pprint.pprintln(gr.graph)
+    //    }
+
+    val g2 = buildSumUpto2()
+
+    for (i ← 0 to 10) {
+      val (best1, best2) = g.randomMatchingSubgraphs(g2)
+
+      println(s"===================== Matched cut $i")
+
+      pprint.pprintln(best1.inputs)
+      pprint.pprintln(best1.outputs)
+      pprint.pprintln(best1.graph)
+      println(s"===================== ")
+      pprint.pprintln(best2.inputs)
+      pprint.pprintln(best2.outputs)
+      pprint.pprintln(best2.graph)
+    }
+
+    //g align 
   }
 
   def buildSumConstants() = {

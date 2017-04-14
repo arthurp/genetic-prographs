@@ -14,6 +14,8 @@ class Block[+Op <: Operation: ClassTag](val name: String, val operation: Op) ext
     PortOnBlock(this, port)
   }
 
+  def ports = inputs ++ outputs
+  
   def inputs = operation.inputs.map(PortOnBlock(this, _))
   def outputs = operation.outputs.map(PortOnBlock(this, _))
 
@@ -55,6 +57,8 @@ case class Connection[T](src: PortOnBlock[T], dst: PortOnBlock[T]) extends Dotab
 
   def tpe = src.port.tpe
 
+  def isIncident(n: PortOnBlock[_]) = src == n || dst == n
+
   def dotName: String = {
     val id = hashCode.toHexString
     s"Connection_$id"
@@ -72,6 +76,12 @@ case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] 
 
   def +(c: AnyConnection) = Graph(blocks + c.src.block + c.dst.block, connections + c)
   def +(b: AnyBlock) = Graph(blocks + b, connections)
+  
+  def -(c: AnyConnection) = Graph(blocks, connections - c)
+  def -(b: AnyBlock) = Graph(blocks - b, connections.filterNot(c => b.ports.exists(c.isIncident(_))))
+  
+  def removeConnections(c: Traversable[AnyConnection]) = Graph(blocks, connections -- c)
+  def removeBlocks(b: Traversable[AnyBlock]) = Graph(blocks -- b, connections.filterNot(c => b.flatMap(_.ports).exists(c.isIncident(_))))
 
   override def toString() = {
     s"""Graph{

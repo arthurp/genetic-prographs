@@ -26,7 +26,7 @@ object MetricOperations {
     }
   }
 
-  implicit class DoubleSeqWithAdditional(val underlying: collection.Seq[Double]) {
+  implicit class DoubleSeqWithAdditional(val underlying: collection.Traversable[Double]) {
     def pNorm(p: Double) = {
       if (p == Double.PositiveInfinity || p == Double.NegativeInfinity) {
         underlying.max
@@ -40,7 +40,7 @@ object MetricOperations {
     }
   }
 
-  implicit class IntSeqWithAdditional(val underlying: collection.Seq[Int]) {
+  implicit class IntSeqWithAdditional(val underlying: collection.Traversable[Int]) {
     def pNorm(p: Double): Double = {
       if (p == Double.PositiveInfinity || p == Double.NegativeInfinity) {
         underlying.max
@@ -58,5 +58,4 @@ object MetricOperations {
     def ?>[N: Numeric](v: N) = if (underlying) v else implicitly[Numeric[N]].one
     def !?>[N: Numeric](v: N) = if (!underlying) v else implicitly[Numeric[N]].zero
   }
-
 }
