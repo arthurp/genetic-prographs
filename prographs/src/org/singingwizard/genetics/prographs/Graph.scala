@@ -76,10 +76,14 @@ case class Graph(blocks: Set[AnyBlock] = Set(), connections: Set[AnyConnection] 
 
   def +(c: AnyConnection) = Graph(blocks + c.src.block + c.dst.block, connections + c)
   def +(b: AnyBlock) = Graph(blocks + b, connections)
-  
+
+  def ++(g: Graph) = Graph(blocks ++ g.blocks, connections ++ g.connections)
+
   def -(c: AnyConnection) = Graph(blocks, connections - c)
   def -(b: AnyBlock) = Graph(blocks - b, connections.filterNot(c => b.ports.exists(c.isIncident(_))))
   
+  def addConnections(c: Traversable[AnyConnection]) = Graph(blocks, connections ++ c)
+
   def removeConnections(c: Traversable[AnyConnection]) = Graph(blocks, connections -- c)
   def removeBlocks(b: Traversable[AnyBlock]) = Graph(blocks -- b, connections.filterNot(c => b.flatMap(_.ports).exists(c.isIncident(_))))
 

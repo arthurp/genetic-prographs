@@ -53,7 +53,7 @@ object MetricOperations {
       }
     }
   }
-
+  
   implicit class BooleanWithAdditional(val underlying: Boolean) extends AnyVal {
     def ?>[N: Numeric](v: N) = if (underlying) v else implicitly[Numeric[N]].one
     def !?>[N: Numeric](v: N) = if (!underlying) v else implicitly[Numeric[N]].zero

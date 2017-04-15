@@ -1,6 +1,7 @@
 package org.singingwizard.util.collections
 
 import scala.util.Random
+import scala.collection.generic.CanBuildFrom
 
 object RandomSelection {
   implicit class IterableWithRandom[T](val underlying: collection.Iterable[T]) extends AnyVal {
@@ -25,6 +26,21 @@ object RandomSelection {
     }
     def random() = {
       underlying(randomIndex())
+    }
+    def shuffle() = {
+      val buf = underlying.toBuffer
+      val n = buf.size
+      // for i from 0 to n−2 do
+      for (i ← 0 to n - 2) {
+        // j ← random integer such that i ≤ j < n
+        val j = Random.nextInt(n - i) + i
+        // exchange a[i] and a[j]
+        val tmp = buf(i)
+        buf(i) = buf(j)
+        buf(j) = tmp
+      }
+      
+      buf.toSeq
     }
   }
   implicit class BufferWithTakeRandom[T](val underlying: collection.mutable.Buffer[T]) extends AnyVal {

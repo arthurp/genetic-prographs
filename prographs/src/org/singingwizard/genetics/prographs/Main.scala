@@ -46,10 +46,13 @@ object Main {
       pprint.pprintln(best1.inputs)
       pprint.pprintln(best1.outputs)
       pprint.pprintln(best1.graph)
-      println(s"===================== ")
+      println(s"--------------- ")
       pprint.pprintln(best2.inputs)
       pprint.pprintln(best2.outputs)
-      pprint.pprintln(best2.graph)
+      pprint.pprintln(best2.graph)      
+      println(s"--------------- ")
+      
+      pprint.pprintln(best1 connect best2)
     }
 
     //g align 
