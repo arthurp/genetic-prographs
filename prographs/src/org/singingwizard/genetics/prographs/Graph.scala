@@ -2,6 +2,7 @@ package org.singingwizard.genetics.prographs
 
 import org.singingwizard.util.{ DotableEdge, DotableGraph, DotableNode }
 import scala.reflect.ClassTag
+import org.singingwizard.util.collections.RandomSelection._
 
 class Block[+Op <: Operation: ClassTag](val name: String, val operation: Op) extends DotableNode {
   override def toString() = {
@@ -115,10 +116,30 @@ ${connections.map(c ⇒ s"${c.src.block.name}.${c.src.port.name} --> ${c.dst.blo
 
   def inputBlocks = blocks.filter(_.operation.isInput)
   def outputBlocks = blocks.filter(_.operation.isOutput)
+  
+  def inputPorts = blocks.flatMap(_.inputs) 
+  
+  def addRandomBlock(blockGenerators: Iterable[() => AnyBlock]) = {
+    this + blockGenerators.random()()
+  }
+  def addRandomConnection() = {
+    val a = blocks.filter(_.outputs.nonEmpty).random().outputs.random().asInstanceOf[PortOnBlock[Any]]
+    val b = inputPorts.filter(_.port.tpe == a.port.tpe).random().asInstanceOf[PortOnBlock[Any]]
+    this + Connection(a, b)
+  }
 }
 
 object Graph {
   def apply(c1: AnyConnection, connections: AnyConnection*): Graph = {
     connections.foldLeft(Graph() + c1)(_ + _)
+  }
+  
+  def random(blockGenerators: Iterable[() => AnyBlock])(nBlocks: Int, connectedRatio: Double): Graph = {
+    val g1 = (0 until nBlocks).foldLeft(Graph())((acc, i) => acc.addRandomBlock(blockGenerators))
+    
+    val nPorts = g1.blocks.toSeq.map(_.ports.size + 1).sum
+    val nConnections = (connectedRatio * 0.5 * nPorts) toInt
+    
+    (0 until nConnections).foldLeft(g1)((acc, i) => acc.addRandomConnection())
   }
 }

@@ -1,7 +1,6 @@
 package org.singingwizard.util.collections
 
 import scala.util.Random
-import scala.collection.generic.CanBuildFrom
 
 object RandomSelection {
   implicit class IterableWithRandom[T](val underlying: collection.Iterable[T]) extends AnyVal {

@@ -70,7 +70,7 @@ object GraphCutting {
     def apply(edges: Set[Edge]): EdgeList = {
       val edges1 = edges.groupBy(e ⇒ Set(e.a, e.b)) map {
         case (s, es) ⇒
-          val Seq(a, b) = s.toSeq
+          val Seq(a, b) = if (s.size == 2) s.toSeq else Seq(s.head, s.head)
           //pprint.pprintln((a, b, es.size, es))
           Edge(a, es.flatMap(_.connections), b)
       }
@@ -184,7 +184,7 @@ trait GraphCutting {
   }
 
   @tailrec
-  final def randomInterfacedSubgraph(n: Int = N_TO_GENERATE): (InterfacedGraph, InterfacedGraph) = {
+  final def randomInterfacedSubgraph(n: Int = N_TO_GENERATE*10): (InterfacedGraph, InterfacedGraph) = {
     val idealSize = this.blocks.size * 0.25
     val g = {
       val (g1, _, g2) = this.randomCut()
@@ -194,7 +194,7 @@ trait GraphCutting {
     def acceptable(gg: InterfacedGraph): Boolean = {
       val interfaceSize = gg.inputs.size + gg.outputs.size
       val graphSize = gg.graph.blocks.size
-      graphSize + interfaceSize > 2 && graphSize > 1
+      interfaceSize >= 2 && graphSize >= 2
     }
 
     if (n <= 0 || (acceptable(g._1) && acceptable(g._2)))

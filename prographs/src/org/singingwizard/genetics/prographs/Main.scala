@@ -1,6 +1,7 @@
 package org.singingwizard.genetics.prographs
 
 import java.util.logging.{ ConsoleHandler, Level, Logger ⇒ JLogger, SimpleFormatter }
+import scala.util.Random
 
 import org.singingwizard.genetics.prographs.interpreter.{ IOInput, IOInterpreter, IOOutput }
 import org.singingwizard.genetics.prographs.operations._
@@ -18,15 +19,34 @@ object Main {
   val Sum = Port("Sum", TypeInt)
   val Max = Port("Max", TypeInt)
 
+  def generateName() = "block"
+
+  val blockGenerators = Set(
+    () ⇒ {
+      val n = Random.nextInt(1024) - 512
+      new Block(n.toString(), Constant(TypeInt, n))
+    },
+    () ⇒ {
+      val n = Random.nextInt(1024) - 512
+      new Block(n.toString(), TriggeredConstant(TypeInt, n, TypeInt))
+    },
+
+    () ⇒ new Block("sum", Add),
+    () ⇒ new Block("switch", Switch(TypeInt)),
+    () ⇒ new Block("<", LessThan),
+    () ⇒ new Block("in", IOInput(Max)),
+    () ⇒ new Block("out", IOOutput(Sum))
+  )
+
   def main(args: Array[String]): Unit = {
-    var g = buildSumUpto()
+    var g = Graph.random(blockGenerators)(20, 0.9)
     //println(g)
     //println(g.toDot)
     //Graphviz.display(g.toDot)
-    val interp = new IOInterpreter(g)
-    interp.inputs += (Max -> 10)
-    interp.run()
-    println(interp.outputs)
+    //    val interp = new IOInterpreter(g)
+    //    interp.inputs += (Max -> 10)
+    //    interp.run()
+    //    println(interp.outputs)
 
     //    for (i ← 0 to 0) {
     //      val gr = g.randomInterfacedSubgraph()
@@ -36,7 +56,7 @@ object Main {
     //      pprint.pprintln(gr.graph)
     //    }
 
-    val g2 = buildSumUpto2()
+    val g2 = Graph.random(blockGenerators)(20, 0.9)
 
     for (i ← 0 to 10) {
       val (best1, best2) = g.randomMatchingSubgraphs(g2)
@@ -49,9 +69,9 @@ object Main {
       println(s"--------------- ")
       pprint.pprintln(best2.inputs)
       pprint.pprintln(best2.outputs)
-      pprint.pprintln(best2.graph)      
+      pprint.pprintln(best2.graph)
       println(s"--------------- ")
-      
+
       pprint.pprintln(best1 connect best2)
     }
 
